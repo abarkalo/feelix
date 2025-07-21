@@ -180,10 +180,18 @@
     <script>
         function handleSubmit(event) {
             event.preventDefault();
-            // For now, just show a confirmation
-            // In production, this would save to a database
             const email = event.target.querySelector('.email-input').value;
-            event.target.innerHTML = '<p style="color: #888;">Thanks! We\'ll be in touch soon.</p>';
+            
+            // Create mailto link to forward the email
+            const subject = encodeURIComponent('User interest from Feelix.me');
+            const body = encodeURIComponent(`New user signup from Feelix.me:\n\nEmail: ${email}\n\nTimestamp: ${new Date().toLocaleString()}`);
+            const mailtoLink = `mailto:alex@barkaloff.com?subject=${subject}&body=${body}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            // Show confirmation message
+            event.target.innerHTML = '<p style="color: #888;">Thanks! Your email client should open now. If not, please email alex@barkaloff.com directly.</p>';
         }
     </script>
 </body>
