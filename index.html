@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feelix - Your Inner Voice, Amplified</title>
-    <meta name="description" content="Feelix: Personal AI that learns your authentic preferences. Coming soon.">
+    <title>Feelix - What You'll Love Next</title>
+    <meta name="description" content="Feelix: Film & TV discovery that resonates. Coming 2026.">
     <style>
         * {
             margin: 0;
@@ -14,7 +14,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #0a0a0a;
+            background: linear-gradient(135deg, #06080c 0%, #080a12 50%, #0a0c14 100%);
             color: #ffffff;
             min-height: 100vh;
             display: flex;
@@ -24,59 +24,291 @@
             position: relative;
         }
         
-        /* Animated gradient background */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 30%, rgba(255, 111, 97, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.08) 0%, transparent 50%);
-            animation: drift 20s ease-in-out infinite;
+        /* Ambient background orbs - deep layer */
+        .ambient-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
         
-        @keyframes drift {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.1); }
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.07;
+            animation: drift-slow 60s ease-in-out infinite;
+        }
+        
+        .ambient-orb-1 {
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.8) 0%, transparent 70%);
+            top: -20%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        
+        .ambient-orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(100, 181, 246, 0.8) 0%, transparent 70%);
+            bottom: -15%;
+            right: -5%;
+            animation-delay: -20s;
+        }
+        
+        .ambient-orb-3 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(186, 104, 200, 0.6) 0%, transparent 70%);
+            top: 40%;
+            right: 20%;
+            animation-delay: -40s;
+        }
+        
+        @keyframes drift-slow {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.05);
+            }
+            50% {
+                transform: translate(-20px, 30px) scale(0.95);
+            }
+            75% {
+                transform: translate(-30px, -10px) scale(1.02);
+            }
+        }
+        
+        /* Clean dark background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Scanline effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+        
+        /* Vignette overlay */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        /* Taste clusters container */
+        .cluster-field {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        /* Connection lines SVG */
+        .connection-svg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .cluster {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .cluster-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .cluster-ring-outer {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        
+        .cluster-ring-inner {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+        
+        .cluster-ring-core {
+            width: 20%;
+            height: 20%;
+            top: 40%;
+            left: 40%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .cluster-name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-align: center;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+        
+        .cluster-id {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.25);
+            white-space: nowrap;
+        }
+        
+        .cluster-small .cluster-name {
+            font-size: 8px;
+            opacity: 0.5;
+        }
+        
+        .cluster-medium .cluster-name {
+            font-size: 10px;
+        }
+        
+        .cluster-large .cluster-name {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Ping animation for some clusters */
+        .cluster-ping {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: ping 3s ease-out infinite;
+        }
+        
+        @keyframes ping {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        /* User node dots */
+        .user-node {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+        }
+        
+        .user-node-dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .container {
             text-align: center;
-            z-index: 1;
+            z-index: 100;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 700px;
+            position: relative;
         }
         
         .logo {
-            font-size: 4rem;
-            font-weight: 300;
-            letter-spacing: -0.05em;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
             opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
+            animation: fadeUp 1.2s ease-out forwards;
+            filter: drop-shadow(0 0 40px rgba(186, 104, 200, 0.2)) drop-shadow(0 0 80px rgba(100, 181, 246, 0.1));
+        }
+        
+        .logo svg {
+            width: 220px;
+            height: auto;
         }
         
         .tagline {
             font-size: 1.25rem;
             font-weight: 300;
-            color: #888;
-            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
             opacity: 0;
-            animation: fadeIn 1s ease-out 0.3s forwards;
-            letter-spacing: 0.02em;
+            animation: fadeUp 1.2s ease-out 0.2s forwards;
+            letter-spacing: 0.05em;
         }
         
         .email-form {
             opacity: 0;
-            animation: fadeIn 1s ease-out 0.6s forwards;
+            animation: fadeUp 1.2s ease-out 0.4s forwards;
         }
         
         .email-group {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.6rem;
             max-width: 400px;
             margin: 0 auto;
         }
@@ -84,89 +316,174 @@
         .email-input {
             flex: 1;
             padding: 0.875rem 1.25rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50px;
             color: #ffffff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 300;
+            transition: all 0.4s ease;
         }
         
         .email-input::placeholder {
-            color: #666;
+            color: rgba(255, 255, 255, 0.25);
         }
         
         .email-input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         
         .submit-btn {
             padding: 0.875rem 2rem;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            background: rgba(255, 255, 255, 0.9);
             border: none;
             border-radius: 50px;
-            color: #ffffff;
-            font-size: 1rem;
+            color: #000;
+            font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            letter-spacing: 0.02em;
         }
         
         .submit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
         }
         
-        @keyframes fadeIn {
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
             to {
                 opacity: 1;
+                transform: translateY(0);
             }
         }
         
-        .bottom-text {
+        /* System status footer */
+        .system-status {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.3);
+            z-index: 100;
+            opacity: 0;
+            animation: fadeUp 1s ease-out 1s forwards;
+        }
+        
+        .status-center {
             position: absolute;
-            bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.875rem;
-            color: #444;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 0.9s forwards;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        
+        .status-center span {
+            margin: 0 0.5rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
         
         .success-message {
-            color: #888;
-            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            font-weight: 300;
             opacity: 0;
-            animation: fadeIn 0.5s ease-out forwards;
+            animation: fadeUp 0.5s ease-out forwards;
         }
         
         /* Mobile responsive */
         @media (max-width: 640px) {
             .logo {
-                font-size: 3rem;
+                font-size: 3.5rem;
             }
             
             .tagline {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
+                margin-bottom: 2.5rem;
             }
             
             .email-group {
                 flex-direction: column;
+                padding: 0 1rem;
             }
             
             .submit-btn {
                 width: 100%;
+                padding: 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <div class="ambient-orbs">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+    <div class="vignette"></div>
+    <div class="cluster-field" id="cluster-field"></div>
+    <svg class="connection-svg" id="connection-svg"></svg>
+    
     <div class="container">
-        <h1 class="logo">feelix</h1>
-        <p class="tagline">Your inner voice, amplified</p>
+        <h1 class="logo">
+            <svg width="100%" height="100%" viewBox="0 0 824 248" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+                <g transform="matrix(1,0,0,1,-3588.166667,-3183.36208)">
+                    <g transform="matrix(1.372834,0,0,1.372834,2808.490212,-1116.210029)">
+                        <path d="M567.932,3309.675L632.404,3309.675L632.404,3306.547C620.616,3306.547 612.197,3301.977 612.197,3285.377L612.197,3229.325L638.178,3229.325C654.296,3229.325 661.513,3236.783 661.513,3257.712L664.64,3257.712L664.64,3197.33L661.513,3197.33C661.513,3218.259 654.296,3225.236 638.418,3225.236L612.197,3225.236L612.197,3145.367L645.154,3145.367C669.452,3145.367 684.367,3160.763 689.9,3191.797L692.787,3191.075L685.81,3141.277L567.932,3141.277L567.932,3144.405C577.795,3144.405 584.772,3148.976 584.772,3165.575L584.772,3285.377C584.772,3301.977 577.555,3306.547 567.932,3306.547L567.932,3309.675Z" style="fill:url(#_Linear1);fill-rule:nonzero;"/>
+                        <path d="M743.306,3312.08C771.693,3312.08 792.622,3290.189 796.952,3261.561L793.584,3261.08C789.735,3279.123 776.504,3292.594 756.537,3292.594C729.834,3292.835 712.994,3269.741 712.994,3235.58C712.994,3234.137 712.994,3232.934 713.235,3231.49L791.419,3231.49C791.419,3206.712 774.82,3185.301 746.193,3185.301C713.957,3185.301 687.735,3212.726 687.735,3249.292C687.735,3283.453 709.626,3312.08 743.306,3312.08ZM713.475,3227.401C716.362,3206.471 729.594,3188.91 744.268,3188.91C759.664,3188.91 765.438,3205.268 765.438,3216.575C765.438,3224.033 762.792,3227.401 755.575,3227.401L713.475,3227.401Z" style="fill:url(#_Linear2);fill-rule:nonzero;"/>
+                        <path d="M861.184,3312.08C889.571,3312.08 910.5,3290.189 914.831,3261.561L911.463,3261.08C907.613,3279.123 894.382,3292.594 874.415,3292.594C847.712,3292.835 830.872,3269.741 830.872,3235.58C830.872,3234.137 830.872,3232.934 831.113,3231.49L909.297,3231.49C909.297,3206.712 892.698,3185.301 864.071,3185.301C831.835,3185.301 805.613,3212.726 805.613,3249.292C805.613,3283.453 827.504,3312.08 861.184,3312.08ZM831.354,3227.401C834.24,3206.471 847.472,3188.91 862.146,3188.91C877.543,3188.91 883.316,3205.268 883.316,3216.575C883.316,3224.033 880.67,3227.401 873.453,3227.401L831.354,3227.401Z" style="fill:url(#_Linear3);fill-rule:nonzero;"/>
+                        <path d="M913.147,3309.675L973.529,3309.675L973.529,3306.547C963.906,3306.547 956.689,3301.977 956.689,3285.377L956.689,3133.098L954.524,3131.895C942.255,3137.669 927.821,3140.315 914.831,3141.277L914.831,3144.405C925.897,3144.405 930.708,3148.495 930.708,3160.282L929.986,3285.377C929.986,3301.977 922.769,3306.547 913.147,3306.547L913.147,3309.675Z" style="fill:url(#_Linear4);fill-rule:nonzero;"/>
+                        <path d="M1003.6,3167.018C1013.944,3167.018 1020.68,3159.801 1020.68,3149.457C1020.68,3139.834 1013.944,3132.858 1003.6,3132.858C993.496,3132.858 986.76,3139.834 986.76,3149.457C986.76,3159.801 993.496,3167.018 1003.6,3167.018ZM975.935,3309.675L1035.595,3309.675L1035.595,3306.547C1025.732,3306.547 1018.756,3301.977 1018.756,3285.377L1018.756,3186.745L1016.591,3185.542C1004.081,3191.316 989.647,3193.962 976.897,3194.924L976.897,3198.051C987.963,3198.292 992.774,3202.141 992.774,3213.929L992.774,3285.377C992.774,3301.977 985.557,3306.547 975.935,3306.547L975.935,3309.675Z" style="fill:url(#_Linear5);fill-rule:nonzero;"/>
+                        <path d="M1104.398,3309.675L1167.908,3309.675L1167.908,3306.547C1157.563,3306.547 1150.587,3301.977 1141.686,3287.783L1111.855,3240.872L1123.643,3220.665C1135.19,3201.179 1151.549,3190.834 1163.096,3190.834L1163.096,3187.707L1112.336,3187.707L1112.336,3190.834C1127.252,3190.834 1129.657,3201.419 1118.351,3220.665L1109.209,3236.783L1092.129,3209.599C1083.228,3195.405 1090.445,3190.834 1099.827,3190.834L1099.827,3187.707L1037.039,3187.707L1037.039,3190.834C1046.902,3190.834 1053.397,3195.405 1062.298,3209.599L1089.242,3252.179L1074.567,3275.274C1062.298,3294.76 1046.902,3306.547 1034.874,3306.547L1034.874,3309.675L1086.836,3309.675L1086.836,3306.547C1072.162,3306.547 1067.831,3294.519 1080.1,3274.792L1091.888,3256.269L1111.855,3287.783C1120.756,3301.977 1113.539,3306.547 1104.398,3306.547L1104.398,3309.675Z" style="fill:url(#_Linear6);fill-rule:nonzero;"/>
+                    </g>
+                </g>
+                <defs>
+                    <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                    <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                    <linearGradient id="_Linear3" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                    <linearGradient id="_Linear4" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                    <linearGradient id="_Linear5" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                    <linearGradient id="_Linear6" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(599.975473,-0,0,78.906856,567.932112,3221.987904)"><stop offset="0" style="stop-color:rgb(186,104,200);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(100,181,246);stop-opacity:1"/></linearGradient>
+                </defs>
+            </svg>
+        </h1>
+        <p class="tagline">What You'll Love Next</p>
         
         <form class="email-form" id="email-form" action="https://formspree.io/f/xanbqlpg" method="POST">
             <div class="email-group">
@@ -183,9 +500,332 @@
         </form>
     </div>
     
-    <p class="bottom-text">Personal AI • On-device intelligence • Coming 2025</p>
+    <div class="system-status">
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Tastespace Online</span>
+        </div>
+        <div class="status-center">
+            Film & TV Discovery <span>•</span> Coming 2026
+        </div>
+        <div>
+            <span id="cluster-count">10 Nodes Active</span>
+        </div>
+    </div>
     
     <script>
+        const clusterField = document.getElementById('cluster-field');
+        
+        // Cluster data with community names and node IDs - expanded with movie taste varieties
+        const clusterData = [
+            // Cinematic movements
+            { name: 'Baroque Vanguard', id: 'Node #2847' },
+            { name: 'Nordic Noir', id: 'Node #1842' },
+            { name: 'Liminal Dreamers', id: 'Node #1829' },
+            { name: 'French New Wave', id: 'Node #0612' },
+            { name: 'Italian Neorealists', id: 'Node #0445' },
+            // Aesthetic preferences
+            { name: 'Minimalist Aesthetes', id: 'Node #1583' },
+            { name: 'Maximalist Visionaries', id: 'Node #3302' },
+            { name: 'Neon Obsessives', id: 'Node #4456' },
+            { name: 'Analog Purists', id: 'Node #2201' },
+            // Emotional clusters
+            { name: 'Melancholy Seekers', id: 'Node #1156' },
+            { name: 'Catharsis Chasers', id: 'Node #2789' },
+            { name: 'Quiet Devastation', id: 'Node #3011' },
+            { name: 'Euphoric Transcendence', id: 'Node #4102' },
+            // Genre-adjacent
+            { name: 'Absurdist Humorists', id: 'Node #3201' },
+            { name: 'Indie Folk Purists', id: 'Node #4192' },
+            { name: 'Cyberpunk Actionistas', id: 'Node #5845' },
+            { name: 'Romantic Realists', id: 'Node #2156' },
+            { name: 'Slow Cinema Devotees', id: 'Node #0923' },
+            { name: 'Documentary Seekers', id: 'Node #3847' },
+            // Atmosphere-based
+            { name: 'Surrealist Wanderers', id: 'Node #4421' },
+            { name: 'Genre Deconstructors', id: 'Node #5512' },
+            { name: 'Nocturnal Dwellers', id: 'Node #1789' },
+            { name: 'Sun-Bleached Realists', id: 'Node #2034' },
+            { name: 'Urban Decay Aesthetes', id: 'Node #3456' },
+            // Director-adjacent tastes
+            { name: 'Tarkovsky Disciples', id: 'Node #0117' },
+            { name: 'Lynch Labyrinth', id: 'Node #0221' },
+            { name: 'Kurosawa School', id: 'Node #0334' },
+            { name: 'Malick Meditators', id: 'Node #0448' },
+            // Era-influenced
+            { name: '70s Paranoia', id: 'Node #1974' },
+            { name: '90s Indie Revival', id: 'Node #1995' },
+            { name: 'Y2K Futurists', id: 'Node #2001' },
+            { name: 'Pre-Code Revivalists', id: 'Node #1932' },
+            // Narrative preferences
+            { name: 'Nonlinear Navigators', id: 'Node #5567' },
+            { name: 'Dialogue Devotees', id: 'Node #5623' },
+            { name: 'Silence Seekers', id: 'Node #5701' },
+            { name: 'Ensemble Enthusiasts', id: 'Node #5834' },
+        ];
+        
+        // Store cluster data for animation
+        const clusters = [];
+        let dataIndex = 0;
+        
+        function createCluster(index) {
+            const data = clusterData[dataIndex % clusterData.length];
+            dataIndex++;
+            
+            // More size variance - tiny to large
+            const sizeRoll = Math.random();
+            let size;
+            if (sizeRoll < 0.2) {
+                size = 80 + Math.random() * 40; // Small: 80-120
+            } else if (sizeRoll < 0.6) {
+                size = 120 + Math.random() * 60; // Medium: 120-180
+            } else if (sizeRoll < 0.85) {
+                size = 180 + Math.random() * 60; // Large: 180-240
+            } else {
+                size = 240 + Math.random() * 60; // Extra large: 240-300
+            }
+            
+            // Determine size class
+            let sizeClass = 'cluster-medium';
+            if (size < 120) sizeClass = 'cluster-small';
+            else if (size > 200) sizeClass = 'cluster-large';
+            
+            // Random starting position - avoid center exclusion zone
+            let startX, startY;
+            const exclusionPadding = 50;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const exclusionWidth = 700 + exclusionPadding * 2;
+            const exclusionHeight = 450 + exclusionPadding * 2;
+            
+            do {
+                startX = Math.random() * window.innerWidth;
+                startY = Math.random() * window.innerHeight;
+            } while (
+                startX > centerX - exclusionWidth/2 && 
+                startX < centerX + exclusionWidth/2 &&
+                startY > centerY - exclusionHeight/2 && 
+                startY < centerY + exclusionHeight/2
+            );
+            
+            // Random velocity (very slow)
+            const vx = (Math.random() - 0.5) * 0.25;
+            const vy = (Math.random() - 0.5) * 0.25;
+            
+            // Create cluster element
+            const cluster = document.createElement('div');
+            cluster.className = `cluster ${sizeClass}`;
+            cluster.style.width = `${size}px`;
+            cluster.style.height = `${size}px`;
+            cluster.style.left = `${startX}px`;
+            cluster.style.top = `${startY}px`;
+            
+            // Outer ring
+            const ringOuter = document.createElement('div');
+            ringOuter.className = 'cluster-ring cluster-ring-outer';
+            cluster.appendChild(ringOuter);
+            
+            // Inner ring (dashed)
+            const ringInner = document.createElement('div');
+            ringInner.className = 'cluster-ring cluster-ring-inner';
+            cluster.appendChild(ringInner);
+            
+            // Core
+            const ringCore = document.createElement('div');
+            ringCore.className = 'cluster-ring cluster-ring-core';
+            cluster.appendChild(ringCore);
+            
+            // Add ping effect to some clusters
+            if (Math.random() > 0.6) {
+                const ping = document.createElement('div');
+                ping.className = 'cluster-ping';
+                ping.style.animationDelay = `${Math.random() * 3}s`;
+                cluster.appendChild(ping);
+            }
+            
+            // Add community name
+            const nameLabel = document.createElement('div');
+            nameLabel.className = 'cluster-name';
+            nameLabel.textContent = data.name;
+            cluster.appendChild(nameLabel);
+            
+            // Add node ID
+            const idLabel = document.createElement('div');
+            idLabel.className = 'cluster-id';
+            idLabel.textContent = data.id;
+            cluster.appendChild(idLabel);
+            
+            // Add user nodes around larger clusters
+            if (size > 180) {
+                const nodeCount = 2 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < nodeCount; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'user-node';
+                    const nodeSize = 10 + Math.random() * 6;
+                    const angle = (Math.PI * 2 / nodeCount) * i + Math.random() * 0.5;
+                    const distance = size * 0.55 + Math.random() * 20;
+                    
+                    node.style.width = `${nodeSize}px`;
+                    node.style.height = `${nodeSize}px`;
+                    node.style.left = `${size/2 + Math.cos(angle) * distance - nodeSize/2}px`;
+                    node.style.top = `${size/2 + Math.sin(angle) * distance - nodeSize/2}px`;
+                    
+                    const dot = document.createElement('div');
+                    dot.className = 'user-node-dot';
+                    node.appendChild(dot);
+                    
+                    cluster.appendChild(node);
+                }
+            }
+            
+            clusterField.appendChild(cluster);
+            
+            // Store cluster data
+            clusters.push({
+                element: cluster,
+                x: startX,
+                y: startY,
+                vx: vx,
+                vy: vy,
+                originalVx: vx,
+                originalVy: vy,
+                size: size,
+                breatheOffset: Math.random() * Math.PI * 2,
+                breatheSpeed: 0.3 + Math.random() * 0.3
+            });
+        }
+        
+        // Create initial clusters - more nodes with greater variance
+        const clusterCount = Math.min(14, Math.max(8, Math.floor(window.innerWidth / 130)));
+        for (let i = 0; i < clusterCount; i++) {
+            createCluster(i);
+        }
+        
+        // Update cluster count display
+        document.getElementById('cluster-count').textContent = `${clusterCount} Nodes Active`;
+        
+        // Animation loop
+        const connectionSvg = document.getElementById('connection-svg');
+        const connectionDistance = 350; // Distance at which connections appear
+        
+        // Define exclusion zone (center area where clusters shouldn't go)
+        const getExclusionZone = () => {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            return {
+                x: centerX - 350,
+                y: centerY - 250,
+                width: 700,
+                height: 450
+            };
+        };
+        
+        let lastTime = 0;
+        function animate(time) {
+            const delta = (time - lastTime) / 16; // Normalize to ~60fps
+            lastTime = time;
+            
+            // Clear previous connection lines
+            connectionSvg.innerHTML = '';
+            
+            const exclusion = getExclusionZone();
+            
+            clusters.forEach((cluster, index) => {
+                // Update position
+                cluster.x += cluster.vx * delta;
+                cluster.y += cluster.vy * delta;
+                
+                // Check if cluster is entering exclusion zone
+                const clusterCenterX = cluster.x + cluster.size / 2;
+                const clusterCenterY = cluster.y + cluster.size / 2;
+                const clusterRadius = cluster.size / 2 + 20; // Add padding
+                
+                const exclusionCenterX = exclusion.x + exclusion.width / 2;
+                const exclusionCenterY = exclusion.y + exclusion.height / 2;
+                
+                // Check collision with exclusion zone
+                const isInExclusionX = clusterCenterX + clusterRadius > exclusion.x && 
+                                        clusterCenterX - clusterRadius < exclusion.x + exclusion.width;
+                const isInExclusionY = clusterCenterY + clusterRadius > exclusion.y && 
+                                        clusterCenterY - clusterRadius < exclusion.y + exclusion.height;
+                
+                if (isInExclusionX && isInExclusionY) {
+                    // Push cluster away from exclusion zone center
+                    const dx = clusterCenterX - exclusionCenterX;
+                    const dy = clusterCenterY - exclusionCenterY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 0) {
+                        // Normalize and apply push
+                        const pushStrength = 0.5;
+                        cluster.vx += (dx / distance) * pushStrength;
+                        cluster.vy += (dy / distance) * pushStrength;
+                        
+                        // Limit velocity
+                        const maxSpeed = 0.8;
+                        const speed = Math.sqrt(cluster.vx * cluster.vx + cluster.vy * cluster.vy);
+                        if (speed > maxSpeed) {
+                            cluster.vx = (cluster.vx / speed) * maxSpeed;
+                            cluster.vy = (cluster.vy / speed) * maxSpeed;
+                        }
+                    }
+                } else {
+                    // Gradually return to original slow velocity
+                    cluster.vx += (cluster.originalVx - cluster.vx) * 0.01;
+                    cluster.vy += (cluster.originalVy - cluster.vy) * 0.01;
+                }
+                
+                // Wrap around screen edges with padding
+                const padding = cluster.size;
+                if (cluster.x < -padding) cluster.x = window.innerWidth + padding/2;
+                if (cluster.x > window.innerWidth + padding) cluster.x = -padding/2;
+                if (cluster.y < -padding) cluster.y = window.innerHeight + padding/2;
+                if (cluster.y > window.innerHeight + padding) cluster.y = -padding/2;
+                
+                // Breathing effect (subtle scale)
+                const breathe = 1 + Math.sin(time * 0.001 * cluster.breatheSpeed + cluster.breatheOffset) * 0.02;
+                
+                // Apply transforms
+                cluster.element.style.transform = `translate(${cluster.x - parseFloat(cluster.element.style.left)}px, ${cluster.y - parseFloat(cluster.element.style.top)}px) scale(${breathe})`;
+                
+                // Draw connections to nearby clusters
+                for (let j = index + 1; j < clusters.length; j++) {
+                    const other = clusters[j];
+                    const dx = cluster.x + cluster.size/2 - (other.x + other.size/2);
+                    const dy = cluster.y + cluster.size/2 - (other.y + other.size/2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Subtract radii to get edge-to-edge distance
+                    const edgeDistance = distance - cluster.size/2 - other.size/2;
+                    
+                    if (edgeDistance < connectionDistance && edgeDistance > 0) {
+                        const opacity = (1 - edgeDistance / connectionDistance) * 0.35;
+                        
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', cluster.x + cluster.size/2);
+                        line.setAttribute('y1', cluster.y + cluster.size/2);
+                        line.setAttribute('x2', other.x + other.size/2);
+                        line.setAttribute('y2', other.y + other.size/2);
+                        line.setAttribute('stroke', `rgba(255, 255, 255, ${opacity})`);
+                        line.setAttribute('stroke-width', '1');
+                        line.setAttribute('stroke-dasharray', '8 4');
+                        
+                        connectionSvg.appendChild(line);
+                    }
+                }
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        requestAnimationFrame(animate);
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            // Reposition clusters if needed
+        });
+        
+        // Form submission handler
         document.getElementById('email-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -194,7 +834,6 @@
             const button = form.querySelector('.submit-btn');
             const originalText = button.textContent;
             
-            // Show loading state
             button.textContent = 'Sending...';
             button.disabled = true;
             
@@ -207,14 +846,12 @@
             })
             .then(response => {
                 if (response.ok) {
-                    // Success! Replace form with success message
-                    form.innerHTML = '<p class="success-message">Thanks for your interest! We\'ll be in touch soon.</p>';
+                    form.innerHTML = '<p class="success-message">Thanks for your interest. We\'ll be in touch soon.</p>';
                 } else {
                     throw new Error('Form submission failed');
                 }
             })
             .catch(error => {
-                // Error - restore button and show message
                 button.textContent = originalText;
                 button.disabled = false;
                 alert('Sorry, there was an error. Please try again or email alex@barkaloff.com directly.');
