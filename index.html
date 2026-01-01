@@ -372,8 +372,8 @@
             left: 0;
             right: 0;
             height: 36px;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 8, 20, 0.9);
+            border-top: 1px solid rgba(147, 51, 234, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -382,7 +382,7 @@
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(186, 148, 220, 0.6);
             z-index: 100;
             opacity: 0;
             animation: fadeUp 1s ease-out 1s forwards;
@@ -392,12 +392,12 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(186, 148, 220, 0.5);
         }
         
         .status-center span {
             margin: 0 0.5rem;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(147, 51, 234, 0.4);
         }
         
         .status-indicator {
@@ -409,9 +409,10 @@
         .status-dot {
             width: 5px;
             height: 5px;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(147, 51, 234, 0.8);
             border-radius: 50%;
             animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(147, 51, 234, 0.6);
         }
         
         @keyframes blink {
@@ -516,52 +517,51 @@
     <script>
         const clusterField = document.getElementById('cluster-field');
         
-        // Cluster data with community names and node IDs - expanded with movie taste varieties
+        // Cluster data with community names and node IDs - cinematic and interesting
         const clusterData = [
-            // Cinematic movements
+            // Classic movements
             { name: 'Baroque Vanguard', id: 'Node #2847' },
             { name: 'Nordic Noir', id: 'Node #1842' },
-            { name: 'Liminal Dreamers', id: 'Node #1829' },
             { name: 'French New Wave', id: 'Node #0612' },
             { name: 'Italian Neorealists', id: 'Node #0445' },
-            // Aesthetic preferences
-            { name: 'Minimalist Aesthetes', id: 'Node #1583' },
-            { name: 'Maximalist Visionaries', id: 'Node #3302' },
+            { name: 'Film Noir Faithful', id: 'Node #1939' },
+            // Visual style
             { name: 'Neon Obsessives', id: 'Node #4456' },
             { name: 'Analog Purists', id: 'Node #2201' },
-            // Emotional clusters
-            { name: 'Melancholy Seekers', id: 'Node #1156' },
-            { name: 'Catharsis Chasers', id: 'Node #2789' },
-            { name: 'Quiet Devastation', id: 'Node #3011' },
-            { name: 'Euphoric Transcendence', id: 'Node #4102' },
-            // Genre-adjacent
-            { name: 'Absurdist Humorists', id: 'Node #3201' },
-            { name: 'Indie Folk Purists', id: 'Node #4192' },
-            { name: 'Cyberpunk Actionistas', id: 'Node #5845' },
-            { name: 'Romantic Realists', id: 'Node #2156' },
-            { name: 'Slow Cinema Devotees', id: 'Node #0923' },
-            { name: 'Documentary Seekers', id: 'Node #3847' },
-            // Atmosphere-based
-            { name: 'Surrealist Wanderers', id: 'Node #4421' },
-            { name: 'Genre Deconstructors', id: 'Node #5512' },
-            { name: 'Nocturnal Dwellers', id: 'Node #1789' },
-            { name: 'Sun-Bleached Realists', id: 'Node #2034' },
-            { name: 'Urban Decay Aesthetes', id: 'Node #3456' },
-            // Director-adjacent tastes
+            { name: 'Maximalist Visionaries', id: 'Node #3302' },
+            { name: 'Cinematography Nerds', id: 'Node #2088' },
+            // Genre lovers
+            { name: 'Thriller Tacticians', id: 'Node #1156' },
+            { name: 'Heist Enthusiasts', id: 'Node #2789' },
+            { name: 'Action Virtuosos', id: 'Node #3011' },
+            { name: 'Sci-Fi Explorers', id: 'Node #4102' },
+            { name: 'Horror Aficionados', id: 'Node #3201' },
+            { name: 'Mystery Mavens', id: 'Node #4192' },
+            { name: 'Western Revivalists', id: 'Node #5845' },
+            { name: 'Comedy Cultists', id: 'Node #2156' },
+            // Cinema culture
+            { name: 'Cult Classic Collectors', id: 'Node #0923' },
+            { name: 'Midnight Movie Club', id: 'Node #3847' },
+            { name: 'Arthouse Adventurers', id: 'Node #4421' },
+            { name: 'Blockbuster Buffs', id: 'Node #5512' },
+            { name: 'Foreign Film Fanatics', id: 'Node #1789' },
+            // Director-adjacent
             { name: 'Tarkovsky Disciples', id: 'Node #0117' },
             { name: 'Lynch Labyrinth', id: 'Node #0221' },
             { name: 'Kurosawa School', id: 'Node #0334' },
-            { name: 'Malick Meditators', id: 'Node #0448' },
+            { name: 'Spielberg Faithful', id: 'Node #0448' },
             // Era-influenced
-            { name: '70s Paranoia', id: 'Node #1974' },
+            { name: 'Golden Age Devotees', id: 'Node #1954' },
             { name: '90s Indie Revival', id: 'Node #1995' },
             { name: 'Y2K Futurists', id: 'Node #2001' },
-            { name: 'Pre-Code Revivalists', id: 'Node #1932' },
-            // Narrative preferences
-            { name: 'Nonlinear Navigators', id: 'Node #5567' },
+            { name: 'New Hollywood Hunters', id: 'Node #1974' },
+            // Experience preferences
+            { name: 'Plot Twist Hunters', id: 'Node #5567' },
             { name: 'Dialogue Devotees', id: 'Node #5623' },
-            { name: 'Silence Seekers', id: 'Node #5701' },
-            { name: 'Ensemble Enthusiasts', id: 'Node #5834' },
+            { name: 'Soundtrack Seekers', id: 'Node #5701' },
+            { name: 'Ensemble Cast Lovers', id: 'Node #5834' },
+            { name: 'Epic Adventurers', id: 'Node #6012' },
+            { name: 'Road Movie Romantics', id: 'Node #6134' },
         ];
         
         // Store cluster data for animation
