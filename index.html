@@ -39,9 +39,10 @@
         .ambient-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(100px);
+            filter: blur(60px);
             opacity: 0.1;
             animation: drift-slow 60s ease-in-out infinite;
+            will-change: transform;
         }
         
         .ambient-orb-1 {
@@ -140,6 +141,7 @@
             height: 100%;
             overflow: hidden;
             pointer-events: none;
+            contain: layout style;
         }
         
         /* Connection lines SVG */
@@ -157,6 +159,7 @@
             position: absolute;
             border-radius: 50%;
             pointer-events: none;
+            will-change: transform;
         }
         
         .cluster-ring {
@@ -204,11 +207,12 @@
             color: rgba(190, 170, 220, 0.85);
             text-transform: uppercase;
             pointer-events: none;
+            text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
         }
         
         .cluster-id {
             position: absolute;
-            bottom: -20px;
+            bottom: -28px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
@@ -216,6 +220,7 @@
             letter-spacing: 0.15em;
             color: rgba(180, 160, 210, 0.45);
             white-space: nowrap;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
         }
         
         .cluster-small .cluster-name {
@@ -674,7 +679,10 @@
                     const node = document.createElement('div');
                     node.className = 'user-node';
                     const nodeSize = 10 + Math.random() * 6;
-                    const angle = (Math.PI * 2 / nodeCount) * i + Math.random() * 0.5;
+                    // Avoid bottom area (where node ID text is) - use angles from -120° to 120° (top 240°)
+                    const angleRange = Math.PI * 1.33; // 240 degrees
+                    const angleStart = -Math.PI * 0.67; // Start at -120 degrees (upper left)
+                    const angle = angleStart + (angleRange / nodeCount) * i + Math.random() * 0.4;
                     const distance = size * 0.55 + Math.random() * 20;
                     
                     node.style.width = `${nodeSize}px`;
@@ -743,12 +751,12 @@
         };
         
         let lastTime = 0;
+        let lastConnectionUpdate = 0;
+        const connectionUpdateInterval = 100; // Update connections every 100ms
+        
         function animate(time) {
             const delta = (time - lastTime) / 16; // Normalize to ~60fps
             lastTime = time;
-            
-            // Clear previous connection lines
-            connectionSvg.innerHTML = '';
             
             const exclusion = getExclusionZone();
             
@@ -805,12 +813,14 @@
                     
                     const dx = clusterCenterX - otherCenterX;
                     const dy = clusterCenterY - otherCenterY;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const distSq = dx * dx + dy * dy;
                     
                     const minDistance = (cluster.size / 2) + (other.size / 2) + 40; // 40px buffer
+                    const minDistSq = minDistance * minDistance;
                     
-                    if (distance < minDistance && distance > 0) {
-                        // Push both clusters apart
+                    if (distSq < minDistSq && distSq > 0) {
+                        // Only calculate sqrt when needed
+                        const distance = Math.sqrt(distSq);
                         const pushStrength = 0.15 * (1 - distance / minDistance);
                         const nx = dx / distance;
                         const ny = dy / distance;
@@ -834,33 +844,46 @@
                 
                 // Apply transforms
                 cluster.element.style.transform = `translate(${cluster.x - parseFloat(cluster.element.style.left)}px, ${cluster.y - parseFloat(cluster.element.style.top)}px) scale(${breathe})`;
+            });
+            
+            // Update connection lines less frequently (throttled)
+            if (time - lastConnectionUpdate > connectionUpdateInterval) {
+                lastConnectionUpdate = time;
+                connectionSvg.innerHTML = '';
                 
                 // Draw connections to nearby clusters
-                for (let j = index + 1; j < clusters.length; j++) {
-                    const other = clusters[j];
-                    const dx = cluster.x + cluster.size/2 - (other.x + other.size/2);
-                    const dy = cluster.y + cluster.size/2 - (other.y + other.size/2);
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    // Subtract radii to get edge-to-edge distance
-                    const edgeDistance = distance - cluster.size/2 - other.size/2;
-                    
-                    if (edgeDistance < connectionDistance && edgeDistance > 0) {
-                        const opacity = (1 - edgeDistance / connectionDistance) * 0.35;
+                for (let i = 0; i < clusters.length; i++) {
+                    const cluster = clusters[i];
+                    for (let j = i + 1; j < clusters.length; j++) {
+                        const other = clusters[j];
+                        const dx = cluster.x + cluster.size/2 - (other.x + other.size/2);
+                        const dy = cluster.y + cluster.size/2 - (other.y + other.size/2);
+                        const distSq = dx * dx + dy * dy;
                         
-                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                        line.setAttribute('x1', cluster.x + cluster.size/2);
-                        line.setAttribute('y1', cluster.y + cluster.size/2);
-                        line.setAttribute('x2', other.x + other.size/2);
-                        line.setAttribute('y2', other.y + other.size/2);
-                        line.setAttribute('stroke', `rgba(255, 255, 255, ${opacity})`);
-                        line.setAttribute('stroke-width', '1');
-                        line.setAttribute('stroke-dasharray', '8 4');
+                        // Early exit with squared distance check
+                        const maxDist = connectionDistance + cluster.size/2 + other.size/2;
+                        if (distSq > maxDist * maxDist) continue;
                         
-                        connectionSvg.appendChild(line);
+                        const distance = Math.sqrt(distSq);
+                        const edgeDistance = distance - cluster.size/2 - other.size/2;
+                        
+                        if (edgeDistance < connectionDistance && edgeDistance > 0) {
+                            const opacity = (1 - edgeDistance / connectionDistance) * 0.35;
+                            
+                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            line.setAttribute('x1', cluster.x + cluster.size/2);
+                            line.setAttribute('y1', cluster.y + cluster.size/2);
+                            line.setAttribute('x2', other.x + other.size/2);
+                            line.setAttribute('y2', other.y + other.size/2);
+                            line.setAttribute('stroke', `rgba(255, 255, 255, ${opacity})`);
+                            line.setAttribute('stroke-width', '1');
+                            line.setAttribute('stroke-dasharray', '8 4');
+                            
+                            connectionSvg.appendChild(line);
+                        }
                     }
                 }
-            });
+            }
             
             requestAnimationFrame(animate);
         }
