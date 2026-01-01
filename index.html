@@ -419,6 +419,18 @@
             50% { opacity: 0.3; }
         }
         
+        /* Mobile: hide center text, simplify footer */
+        @media (max-width: 640px) {
+            .system-status {
+                padding: 0 16px;
+                font-size: 8px;
+            }
+            
+            .status-center {
+                display: none;
+            }
+        }
+        
         .success-message {
             color: rgba(255, 255, 255, 0.8);
             font-size: 1.2rem;
