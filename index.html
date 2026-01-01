@@ -407,17 +407,17 @@
         }
         
         .status-dot {
-            width: 6px;
-            height: 6px;
-            background: rgba(180, 130, 255, 1);
+            width: 7px;
+            height: 7px;
+            background: #b480ff;
             border-radius: 50%;
             animation: blink 2s ease-in-out infinite;
-            box-shadow: 0 0 12px rgba(180, 130, 255, 0.9), 0 0 20px rgba(147, 51, 234, 0.6);
+            box-shadow: 0 0 4px #b480ff;
         }
         
         @keyframes blink {
-            0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(180, 130, 255, 0.9), 0 0 20px rgba(147, 51, 234, 0.6); }
-            50% { opacity: 0.5; box-shadow: 0 0 6px rgba(180, 130, 255, 0.5), 0 0 10px rgba(147, 51, 234, 0.3); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
         
         .success-message {
