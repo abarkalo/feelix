@@ -732,11 +732,23 @@
         }
         
         updateNodeCount();
-        setInterval(updateNodeCount, 2000 + Math.random() * 1000); // Update every 2-3 seconds
+        setInterval(updateNodeCount, 2500); // Update every 2.5 seconds
         
         // Animation loop
         const connectionSvg = document.getElementById('connection-svg');
         const connectionDistance = 350; // Distance at which connections appear
+        
+        // Pre-create a pool of line elements (max possible connections for 12 clusters = 66)
+        const linePool = [];
+        const maxLines = 50;
+        for (let i = 0; i < maxLines; i++) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-dasharray', '8 4');
+            line.style.display = 'none';
+            connectionSvg.appendChild(line);
+            linePool.push(line);
+        }
         
         // Define exclusion zone (center area where clusters shouldn't go)
         const getExclusionZone = () => {
@@ -849,7 +861,9 @@
             // Update connection lines less frequently (throttled)
             if (time - lastConnectionUpdate > connectionUpdateInterval) {
                 lastConnectionUpdate = time;
-                connectionSvg.innerHTML = '';
+                
+                // Hide all lines first
+                let lineIndex = 0;
                 
                 // Draw connections to nearby clusters
                 for (let i = 0; i < clusters.length; i++) {
@@ -867,21 +881,24 @@
                         const distance = Math.sqrt(distSq);
                         const edgeDistance = distance - cluster.size/2 - other.size/2;
                         
-                        if (edgeDistance < connectionDistance && edgeDistance > 0) {
+                        if (edgeDistance < connectionDistance && edgeDistance > 0 && lineIndex < maxLines) {
                             const opacity = (1 - edgeDistance / connectionDistance) * 0.35;
                             
-                            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            const line = linePool[lineIndex];
                             line.setAttribute('x1', cluster.x + cluster.size/2);
                             line.setAttribute('y1', cluster.y + cluster.size/2);
                             line.setAttribute('x2', other.x + other.size/2);
                             line.setAttribute('y2', other.y + other.size/2);
                             line.setAttribute('stroke', `rgba(255, 255, 255, ${opacity})`);
-                            line.setAttribute('stroke-width', '1');
-                            line.setAttribute('stroke-dasharray', '8 4');
-                            
-                            connectionSvg.appendChild(line);
+                            line.style.display = '';
+                            lineIndex++;
                         }
                     }
+                }
+                
+                // Hide unused lines
+                for (let i = lineIndex; i < maxLines; i++) {
+                    linePool[i].style.display = 'none';
                 }
             }
             
