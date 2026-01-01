@@ -407,17 +407,17 @@
         }
         
         .status-dot {
-            width: 5px;
-            height: 5px;
-            background: rgba(167, 91, 254, 0.9);
+            width: 6px;
+            height: 6px;
+            background: rgba(180, 130, 255, 1);
             border-radius: 50%;
             animation: blink 2s ease-in-out infinite;
-            box-shadow: 0 0 10px rgba(147, 51, 234, 0.8);
+            box-shadow: 0 0 12px rgba(180, 130, 255, 0.9), 0 0 20px rgba(147, 51, 234, 0.6);
         }
         
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(180, 130, 255, 0.9), 0 0 20px rgba(147, 51, 234, 0.6); }
+            50% { opacity: 0.5; box-shadow: 0 0 6px rgba(180, 130, 255, 0.5), 0 0 10px rgba(147, 51, 234, 0.3); }
         }
         
         .success-message {
@@ -701,8 +701,18 @@
             createCluster(i);
         }
         
-        // Update cluster count display
-        document.getElementById('cluster-count').textContent = `${clusterCount} Nodes Active`;
+        // Update cluster count display with oscillating number
+        const baseNodeCount = 3456;
+        const nodeCountElement = document.getElementById('cluster-count');
+        
+        function updateNodeCount() {
+            const oscillation = Math.floor(Math.random() * 14) - 7 + Math.floor(Math.random() * 20); // -7 to +27 range
+            const currentCount = baseNodeCount + oscillation;
+            nodeCountElement.textContent = `${currentCount.toLocaleString()} Nodes Active`;
+        }
+        
+        updateNodeCount();
+        setInterval(updateNodeCount, 2000 + Math.random() * 1000); // Update every 2-3 seconds
         
         // Animation loop
         const connectionSvg = document.getElementById('connection-svg');
