@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Feelix - What You'll Love Next</title>
     <meta name="description" content="Feelix: Film & TV discovery that resonates. Coming 2026.">
     <style>
@@ -12,16 +14,22 @@
             box-sizing: border-box;
         }
         
+        html {
+            background: #0a0e1a;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #0a0e1a 0%, #0c1222 50%, #0e1628 100%);
             color: #ffffff;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             position: relative;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         /* Ambient background orbs - deep layer */
@@ -377,13 +385,16 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 36px;
-            background: rgba(10, 8, 20, 0.9);
+            height: calc(36px + env(safe-area-inset-bottom));
+            padding-bottom: env(safe-area-inset-bottom);
+            background: rgba(10, 8, 20, 0.95);
             border-top: 1px solid rgba(147, 51, 234, 0.3);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
+            align-items: flex-start;
+            padding-top: 10px;
+            padding-left: 24px;
+            padding-right: 24px;
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
             font-size: 9px;
             text-transform: uppercase;
@@ -589,17 +600,19 @@
             const data = clusterData[dataIndex % clusterData.length];
             dataIndex++;
             
-            // More size variance - tiny to large
+            // More size variance - tiny to large (smaller on mobile)
             const sizeRoll = Math.random();
+            const isMobileSize = window.innerWidth < 640;
+            const sizeMult = isMobileSize ? 0.7 : 1;
             let size;
             if (sizeRoll < 0.2) {
-                size = 80 + Math.random() * 40; // Small: 80-120
+                size = (80 + Math.random() * 40) * sizeMult; // Small: 80-120 (56-84 on mobile)
             } else if (sizeRoll < 0.6) {
-                size = 120 + Math.random() * 60; // Medium: 120-180
+                size = (120 + Math.random() * 60) * sizeMult; // Medium: 120-180 (84-126 on mobile)
             } else if (sizeRoll < 0.85) {
-                size = 180 + Math.random() * 60; // Large: 180-240
+                size = (180 + Math.random() * 60) * sizeMult; // Large: 180-240 (126-168 on mobile)
             } else {
-                size = 240 + Math.random() * 60; // Extra large: 240-300
+                size = (240 + Math.random() * 60) * sizeMult; // Extra large: 240-300 (168-210 on mobile)
             }
             
             // Determine size class
@@ -612,8 +625,9 @@
             const exclusionPadding = 50;
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            const exclusionWidth = 700 + exclusionPadding * 2;
-            const exclusionHeight = 450 + exclusionPadding * 2;
+            const isMobile = window.innerWidth < 640;
+            const exclusionWidth = (isMobile ? 320 : 700) + exclusionPadding * 2;
+            const exclusionHeight = (isMobile ? 280 : 450) + exclusionPadding * 2;
             
             do {
                 startX = Math.random() * window.innerWidth;
@@ -672,8 +686,9 @@
             idLabel.textContent = data.id;
             cluster.appendChild(idLabel);
             
-            // Add user nodes around larger clusters
-            if (size > 180) {
+            // Add user nodes around larger clusters (adjusted threshold for mobile)
+            const userNodeThreshold = isMobileSize ? 120 : 180;
+            if (size > userNodeThreshold) {
                 const nodeCount = 2 + Math.floor(Math.random() * 3);
                 for (let i = 0; i < nodeCount; i++) {
                     const node = document.createElement('div');
@@ -751,14 +766,21 @@
         }
         
         // Define exclusion zone (center area where clusters shouldn't go)
+        // Smaller on mobile to let clusters be more visible
         const getExclusionZone = () => {
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
+            const isMobile = window.innerWidth < 640;
+            
+            // Smaller exclusion zone on mobile
+            const width = isMobile ? 320 : 700;
+            const height = isMobile ? 280 : 450;
+            
             return {
-                x: centerX - 350,
-                y: centerY - 250,
-                width: 700,
-                height: 450
+                x: centerX - width/2,
+                y: centerY - height/2,
+                width: width,
+                height: height
             };
         };
         
