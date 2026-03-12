@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Feelix Studio ROI Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0E14;
+    --surface: #13151E;
+    --raised: #1A1D2A;
+    --border: #252838;
+    --border-light: #2E3248;
+    --text: #E4E5EB;
+    --muted: #8B8FA0;
+    --dim: #5C6070;
+    --accent: #2DD4BF;
+    --trad: #E85D5D;
+    --trad-bg: rgba(232,93,93,0.08);
+    --trad-border: rgba(232,93,93,0.25);
+    --feelix: #2DD4BF;
+    --feelix-bg: rgba(45,212,191,0.08);
+    --feelix-border: rgba(45,212,191,0.25);
+    --gold: #E8C547;
+    --blue: #5EA2E3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 28px 36px 40px;
+    min-height: 100vh;
+  }
+
+  .hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .hdr h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .hdr h1 em { font-style: normal; color: var(--accent); }
+  .hdr .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.8px; }
+  .sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  /* ---- MAIN GRID ---- */
+  .main { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
+  @media (max-width: 1100px) { .main { grid-template-columns: 1fr; } }
+
+  /* ---- CONTROLS PANEL ---- */
+  .controls { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card h3 {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--dim); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card h3 .dot {
+    width: 8px; height: 8px; border-radius: 2px;
+  }
+
+  .sr { margin-bottom: 11px; }
+  .sr:last-child { margin-bottom: 0; }
+  .sl { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .sl span { font-size: 11.5px; color: var(--muted); }
+  .sl .v { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 500; color: var(--accent); }
+
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    box-shadow: 0 0 6px rgba(45,212,191,0.3);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg);
+    background: var(--accent); box-shadow: 0 0 6px rgba(45,212,191,0.3);
+  }
+
+  /* Traditional sliders get red thumb */
+  .trad-slider::-webkit-slider-thumb { background: var(--trad); box-shadow: 0 0 6px rgba(232,93,93,0.3); }
+  .trad-slider::-moz-range-thumb { background: var(--trad); box-shadow: 0 0 6px rgba(232,93,93,0.3); }
+  .trad-val { color: var(--trad) !important; }
+
+  /* ---- RESULTS PANEL ---- */
+  .results { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Punchline banner */
+  .punchline {
+    background: var(--feelix-bg);
+    border: 1px solid var(--feelix-border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+  }
+  .punchline .big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .punchline .caption { font-size: 13px; color: var(--muted); }
+
+  /* Side-by-side columns */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .col-card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+  }
+  .col-card.trad-card { border-top: 3px solid var(--trad); }
+  .col-card.feelix-card { border-top: 3px solid var(--feelix); }
+
+  .col-card h4 {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .col-card.trad-card h4 { color: var(--trad); }
+  .col-card.feelix-card h4 { color: var(--feelix); }
+
+  .metric-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(37,40,56,0.5);
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-row .label { font-size: 12px; color: var(--muted); }
+  .metric-row .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500;
+  }
+  .trad-card .metric-row .value { color: var(--text); }
+  .feelix-card .metric-row .value { color: var(--text); }
+
+  /* Delta table */
+  .delta-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .delta-card h4 {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--gold); margin-bottom: 14px;
+  }
+  .delta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .delta-item {
+    background: var(--raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .delta-item .dn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px; font-weight: 700;
+  }
+  .delta-item .dl {
+    font-size: 9px; color: var(--dim);
+    margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .positive { color: var(--accent); }
+  .negative { color: var(--trad); }
+
+  /* Waterfall chart */
+  .waterfall-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .waterfall-box h4 {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--blue); margin-bottom: 14px;
+  }
+  .wf-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .wf-row:last-child { margin-bottom: 0; }
+  .wf-label {
+    font-size: 11px; color: var(--muted);
+    width: 140px; flex-shrink: 0; text-align: right;
+  }
+  .wf-bar-wrap {
+    flex: 1; height: 22px; background: var(--raised);
+    border-radius: 4px; position: relative; overflow: hidden;
+  }
+  .wf-bar {
+    height: 100%; border-radius: 4px;
+    transition: width 0.2s;
+    min-width: 2px;
+  }
+  .wf-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    width: 70px; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Feelix <em>Studio ROI Model</em></h1>
+  <div class="tag">FEELIX &middot; CONFIDENTIAL</div>
+</div>
+<p class="sub">Same film. Same total budget. What happens when you redirect a fraction of spend to taste-matched precision?</p>
+
+<div class="main">
+
+  <!-- CONTROLS -->
+  <div class="controls">
+
+    <div class="card">
+      <h3><span class="dot" style="background:var(--gold)"></span> Film Parameters</h3>
+      <div class="sr">
+        <div class="sl"><span>Production Budget</span><span class="v" id="dProd">$55M</span></div>
+        <input type="range" id="sProd" min="5" max="200" step="1" value="55">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Marketing Budget</span><span class="v" id="dMkt">$30M</span></div>
+        <input type="range" id="sMkt" min="2" max="150" step="1" value="30">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Ticket Price</span><span class="v" id="dTix">$12</span></div>
+        <input type="range" id="sTix" min="8" max="20" step="0.50" value="12">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>PVOD Price</span><span class="v" id="dPvod">$19.99</span></div>
+        <input type="range" id="sPvod" min="9.99" max="24.99" step="1" value="19.99">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot" style="background:var(--trad)"></span> Traditional Marketing</h3>
+      <div class="sr">
+        <div class="sl"><span>Blended CPM</span><span class="v trad-val" id="dCpm">$15</span></div>
+        <input type="range" class="trad-slider" id="sCpm" min="4" max="30" step="0.5" value="15">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Conversion Rate</span><span class="v trad-val" id="dTconv">0.20%</span></div>
+        <input type="range" class="trad-slider" id="sTconv" min="0.05" max="0.50" step="0.01" value="0.20">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot" style="background:var(--feelix)"></span> Feelix Parameters</h3>
+      <div class="sr">
+        <div class="sl"><span>Feelix Allocation</span><span class="v" id="dAlloc">5%</span></div>
+        <input type="range" id="sAlloc" min="1" max="30" step="0.5" value="5">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Taste-Match Conv (Theatrical)</span><span class="v" id="dFconv">3.0%</span></div>
+        <input type="range" id="sFconv" min="1" max="10" step="0.1" value="3">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>PVOD Watchlist Conv</span><span class="v" id="dPconv">10%</span></div>
+        <input type="range" id="sPconv" min="3" max="20" step="0.5" value="10">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>CPQV Cost/User</span><span class="v" id="dCpqv">$0.15</span></div>
+        <input type="range" id="sCpqv" min="0.03" max="0.50" step="0.01" value="0.15">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Watchlist Rate</span><span class="v" id="dWl">12%</span></div>
+        <input type="range" id="sWl" min="5" max="30" step="1" value="12">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results">
+
+    <!-- Punchline -->
+    <div class="punchline">
+      <div class="big" id="punchNum">—</div>
+      <div class="caption" id="punchText">Adjust sliders to see the comparison</div>
+    </div>
+
+    <!-- Delta metrics -->
+    <div class="delta-card">
+      <h4>The Delta</h4>
+      <div class="delta-grid">
+        <div class="delta-item"><div class="dn" id="dxRev">—</div><div class="dl">Added Revenue</div></div>
+        <div class="delta-item"><div class="dn" id="dxROI">—</div><div class="dl">ROI Improvement</div></div>
+        <div class="delta-item"><div class="dn" id="dxCPT">—</div><div class="dl">Cost/Ticket Change</div></div>
+        <div class="delta-item"><div class="dn" id="dxPVOD">—</div><div class="dl">PVOD Revenue</div></div>
+      </div>
+    </div>
+
+    <!-- Side by side -->
+    <div class="comparison">
+      <div class="col-card trad-card">
+        <h4>Traditional Only</h4>
+        <div class="metric-row"><span class="label">Marketing Spend</span><span class="value" id="tSpend">—</span></div>
+        <div class="metric-row"><span class="label">Impressions</span><span class="value" id="tImps">—</span></div>
+        <div class="metric-row"><span class="label">Ticket Conversions</span><span class="value" id="tConv">—</span></div>
+        <div class="metric-row"><span class="label">Box Office</span><span class="value" id="tBO">—</span></div>
+        <div class="metric-row"><span class="label">PVOD Revenue</span><span class="value" id="tPVOD">—</span></div>
+        <div class="metric-row"><span class="label">Total Revenue</span><span class="value" id="tTotalRev">—</span></div>
+        <div class="metric-row"><span class="label">Cost per Ticket</span><span class="value" id="tCPT">—</span></div>
+        <div class="metric-row"><span class="label">Marketing ROI</span><span class="value" id="tROI">—</span></div>
+        <div class="metric-row"><span class="label">Net P&L</span><span class="value" id="tPL">—</span></div>
+      </div>
+      <div class="col-card feelix-card">
+        <h4>Traditional + Feelix</h4>
+        <div class="metric-row"><span class="label">Traditional Spend</span><span class="value" id="fTradSpend">—</span></div>
+        <div class="metric-row"><span class="label">Feelix Spend</span><span class="value" id="fFeelSpend">—</span></div>
+        <div class="metric-row"><span class="label">Traditional Tickets</span><span class="value" id="fTradConv">—</span></div>
+        <div class="metric-row"><span class="label">Feelix Tickets</span><span class="value" id="fFeelConv">—</span></div>
+        <div class="metric-row"><span class="label">Box Office</span><span class="value" id="fBO">—</span></div>
+        <div class="metric-row"><span class="label">PVOD Revenue</span><span class="value" id="fPVOD">—</span></div>
+        <div class="metric-row"><span class="label">Total Revenue</span><span class="value" id="fTotalRev">—</span></div>
+        <div class="metric-row"><span class="label">Cost per Ticket</span><span class="value" id="fCPT">—</span></div>
+        <div class="metric-row"><span class="label">Marketing ROI</span><span class="value" id="fROI">—</span></div>
+        <div class="metric-row"><span class="label">Net P&L</span><span class="value" id="fPL">—</span></div>
+      </div>
+    </div>
+
+    <!-- Waterfall -->
+    <div class="waterfall-box">
+      <h4>Revenue Waterfall</h4>
+      <div id="waterfall"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===================================================
+   HELPERS
+   =================================================== */
+function $(id) { return document.getElementById(id); }
+
+function fmtD(n) {
+  if (Math.abs(n) >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + Math.round(n);
+}
+
+function fmtN(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return Math.round(n/1e3).toLocaleString() + 'K';
+  return Math.round(n).toLocaleString();
+}
+
+function fmtPct(n) { return (n >= 0 ? '+' : '') + n.toFixed(1) + '%'; }
+
+/* ===================================================
+   MODEL
+   =================================================== */
+function compute() {
+  var prod     = parseFloat($('sProd').value) * 1e6;
+  var mkt      = parseFloat($('sMkt').value) * 1e6;
+  var tix      = parseFloat($('sTix').value);
+  var pvod     = parseFloat($('sPvod').value);
+  var cpm      = parseFloat($('sCpm').value);
+  var tConvR   = parseFloat($('sTconv').value) / 100;
+  var allocPct = parseFloat($('sAlloc').value) / 100;
+  var fConvR   = parseFloat($('sFconv').value) / 100;
+  var pConvR   = parseFloat($('sPconv').value) / 100;
+  var cpqv     = parseFloat($('sCpqv').value);
+  var wlRate   = parseFloat($('sWl').value) / 100;
+
+  // Studio keeps ~50% of ticket price after exhibitor split
+  var studioShare = 0.50;
+  // Studio keeps ~80% of PVOD after platform cut
+  var pvodShare = 0.80;
+
+  // ---- TRADITIONAL ONLY ----
+  var t_spend = mkt;
+  var t_imps  = (t_spend / cpm) * 1000;
+  var t_conv  = Math.round(t_imps * tConvR);
+  var t_bo    = t_conv * tix;
+  var t_boNet = t_bo * studioShare;
+  var t_pvod  = 0;  // Traditional has no PVOD conversion layer
+  var t_totalRev = t_boNet + t_pvod;
+  var t_cpt   = t_conv > 0 ? t_spend / t_conv : 0;
+  var t_roi   = t_spend > 0 ? t_totalRev / t_spend : 0;
+  var t_pl    = t_totalRev - prod - t_spend;
+
+  // ---- TRADITIONAL + FEELIX ----
+  var f_tradSpend = mkt * (1 - allocPct);
+  var f_feelSpend = mkt * allocPct;
+
+  // Traditional portion (same CPM and conversion, less budget)
+  var f_tradImps = (f_tradSpend / cpm) * 1000;
+  var f_tradConv = Math.round(f_tradImps * tConvR);
+
+  // Feelix portion
+  var f_usersReached = Math.round(f_feelSpend / cpqv);
+  var f_feelConv     = Math.round(f_usersReached * fConvR);
+  var f_watchlist    = Math.round(f_usersReached * wlRate);
+  var f_pvodConv     = Math.round(f_watchlist * pConvR);
+
+  var f_totalConv = f_tradConv + f_feelConv;
+  var f_bo        = f_totalConv * tix;
+  var f_boNet     = f_bo * studioShare;
+  var f_pvodRev   = f_pvodConv * pvod * pvodShare;
+  var f_totalRev  = f_boNet + f_pvodRev;
+  var f_cpt       = f_totalConv > 0 ? mkt / f_totalConv : 0;
+  var f_roi       = mkt > 0 ? f_totalRev / mkt : 0;
+  var f_pl        = f_totalRev - prod - mkt;
+
+  return {
+    prod: prod, mkt: mkt,
+    // Traditional
+    t: { spend: t_spend, imps: t_imps, conv: t_conv, bo: t_bo, boNet: t_boNet, pvod: t_pvod, totalRev: t_totalRev, cpt: t_cpt, roi: t_roi, pl: t_pl },
+    // Feelix combined
+    f: { tradSpend: f_tradSpend, feelSpend: f_feelSpend, tradConv: f_tradConv, feelConv: f_feelConv, usersReached: f_usersReached, watchlist: f_watchlist, pvodConv: f_pvodConv, totalConv: f_totalConv, bo: f_bo, boNet: f_boNet, pvod: f_pvodRev, totalRev: f_totalRev, cpt: f_cpt, roi: f_roi, pl: f_pl }
+  };
+}
+
+/* ===================================================
+   WATERFALL
+   =================================================== */
+function buildWaterfall(r) {
+  var items = [
+    { label: 'Trad Box Office',   tVal: r.t.boNet,    fVal: r.f.boNet,   color: '#5EA2E3' },
+    { label: 'PVOD Revenue',      tVal: r.t.pvod,     fVal: r.f.pvod,    color: '#A855F7' },
+    { label: 'Total Revenue',     tVal: r.t.totalRev,  fVal: r.f.totalRev, color: '#E8C547' },
+  ];
+
+  var maxVal = 0;
+  for (var i = 0; i < items.length; i++) {
+    maxVal = Math.max(maxVal, items[i].tVal, items[i].fVal);
+  }
+  if (maxVal === 0) maxVal = 1;
+
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var tW = Math.max(1, (it.tVal / maxVal) * 100);
+    var fW = Math.max(1, (it.fVal / maxVal) * 100);
+
+    html += '<div class="wf-row">';
+    html += '<div class="wf-label">' + it.label + '</div>';
+    html += '<div style="flex:1;display:flex;flex-direction:column;gap:3px">';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<div class="wf-bar-wrap"><div class="wf-bar" style="width:' + tW + '%;background:' + it.color + ';opacity:0.35"></div></div>';
+    html += '<div class="wf-num" style="color:var(--trad)">' + fmtD(it.tVal) + '</div>';
+    html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<div class="wf-bar-wrap"><div class="wf-bar" style="width:' + fW + '%;background:' + it.color + '"></div></div>';
+    html += '<div class="wf-num" style="color:var(--feelix)">' + fmtD(it.fVal) + '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  $('waterfall').innerHTML = html;
+}
+
+/* ===================================================
+   REFRESH
+   =================================================== */
+function refresh() {
+  var r = compute();
+
+  // ---- Slider readouts ----
+  $('dProd').textContent  = '$' + $('sProd').value + 'M';
+  $('dMkt').textContent   = '$' + $('sMkt').value + 'M';
+  $('dTix').textContent   = '$' + parseFloat($('sTix').value).toFixed(2);
+  $('dPvod').textContent  = '$' + parseFloat($('sPvod').value).toFixed(2);
+  $('dCpm').textContent   = '$' + parseFloat($('sCpm').value).toFixed(1);
+  $('dTconv').textContent = parseFloat($('sTconv').value).toFixed(2) + '%';
+  $('dAlloc').textContent = parseFloat($('sAlloc').value).toFixed(1) + '%';
+  $('dFconv').textContent = parseFloat($('sFconv').value).toFixed(1) + '%';
+  $('dPconv').textContent = parseFloat($('sPconv').value).toFixed(0) + '%';
+  $('dCpqv').textContent  = '$' + parseFloat($('sCpqv').value).toFixed(2);
+  $('dWl').textContent    = parseFloat($('sWl').value).toFixed(0) + '%';
+
+  // ---- Traditional column ----
+  $('tSpend').textContent    = fmtD(r.t.spend);
+  $('tImps').textContent     = fmtN(r.t.imps);
+  $('tConv').textContent     = fmtN(r.t.conv);
+  $('tBO').textContent       = fmtD(r.t.boNet);
+  $('tPVOD').textContent     = '$0';
+  $('tTotalRev').textContent = fmtD(r.t.totalRev);
+  $('tCPT').textContent      = r.t.cpt > 0 ? fmtD(r.t.cpt) : '—';
+  $('tROI').textContent      = r.t.roi.toFixed(2) + 'x';
+  $('tPL').textContent       = fmtD(r.t.pl);
+  $('tPL').style.color       = r.t.pl >= 0 ? 'var(--accent)' : 'var(--trad)';
+
+  // ---- Feelix column ----
+  $('fTradSpend').textContent = fmtD(r.f.tradSpend);
+  $('fFeelSpend').textContent = fmtD(r.f.feelSpend);
+  $('fTradConv').textContent  = fmtN(r.f.tradConv);
+  $('fFeelConv').textContent  = fmtN(r.f.feelConv);
+  $('fBO').textContent        = fmtD(r.f.boNet);
+  $('fPVOD').textContent      = fmtD(r.f.pvod);
+  $('fTotalRev').textContent  = fmtD(r.f.totalRev);
+  $('fCPT').textContent       = r.f.cpt > 0 ? fmtD(r.f.cpt) : '—';
+  $('fROI').textContent       = r.f.roi.toFixed(2) + 'x';
+  $('fPL').textContent        = fmtD(r.f.pl);
+  $('fPL').style.color        = r.f.pl >= 0 ? 'var(--accent)' : 'var(--trad)';
+
+  // ---- Deltas ----
+  var addedRev = r.f.totalRev - r.t.totalRev;
+  var roiDelta = r.f.roi - r.t.roi;
+  var cptDelta = r.t.cpt > 0 && r.f.cpt > 0 ? ((r.f.cpt - r.t.cpt) / r.t.cpt * 100) : 0;
+
+  $('dxRev').textContent = (addedRev >= 0 ? '+' : '') + fmtD(addedRev);
+  $('dxRev').className = 'dn ' + (addedRev >= 0 ? 'positive' : 'negative');
+
+  $('dxROI').textContent = (roiDelta >= 0 ? '+' : '') + roiDelta.toFixed(2) + 'x';
+  $('dxROI').className = 'dn ' + (roiDelta >= 0 ? 'positive' : 'negative');
+
+  $('dxCPT').textContent = fmtPct(cptDelta);
+  $('dxCPT').className = 'dn ' + (cptDelta <= 0 ? 'positive' : 'negative');
+
+  $('dxPVOD').textContent = '+' + fmtD(r.f.pvod);
+  $('dxPVOD').className = 'dn positive';
+
+  // ---- Punchline ----
+  var pctMore = r.t.totalRev > 0 ? ((r.f.totalRev - r.t.totalRev) / r.t.totalRev * 100) : 0;
+  var allocPctVal = parseFloat($('sAlloc').value);
+
+  if (pctMore > 0) {
+    $('punchNum').textContent = '+' + pctMore.toFixed(0) + '% more revenue';
+    $('punchText').textContent = 'By redirecting just ' + allocPctVal.toFixed(0) + '% of spend to taste-matched precision — same total budget';
+  } else if (pctMore === 0) {
+    $('punchNum').textContent = 'Break even';
+    $('punchText').textContent = 'Feelix matches traditional performance at this allocation';
+  } else {
+    $('punchNum').textContent = pctMore.toFixed(0) + '% less revenue';
+    $('punchText').textContent = 'Increase Feelix conversion rate or allocation to see the advantage';
+  }
+
+  // ---- Waterfall ----
+  buildWaterfall(r);
+}
+
+/* ===================================================
+   LISTENERS
+   =================================================== */
+var ids = ['sProd','sMkt','sTix','sPvod','sCpm','sTconv','sAlloc','sFconv','sPconv','sCpqv','sWl'];
+for (var i = 0; i < ids.length; i++) {
+  (function(id) {
+    $(id).addEventListener('input', refresh);
+  })(ids[i]);
+}
+
+refresh();
+</script>
+</body>
+</html>
