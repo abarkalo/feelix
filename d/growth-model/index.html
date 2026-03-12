@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Feelix MAU Growth Model</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0E14;
+    --surface: #13151E;
+    --raised: #1A1D2A;
+    --border: #252838;
+    --text: #E4E5EB;
+    --muted: #8B8FA0;
+    --dim: #5C6070;
+    --accent: #2DD4BF;
+    --v1: #A855F7;
+    --v2: #F472B6;
+    --v3: #22D3EE;
+    --v4: #E8C547;
+    --net: #5EA2E3;
+    --b2b: #8B95A5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 28px 36px;
+    min-height: 100vh;
+  }
+
+  .hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .hdr h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .hdr h1 em { font-style: normal; color: var(--accent); }
+  .hdr .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.8px; }
+  .sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+
+  .chart-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 16px;
+  }
+  .chart-wrap { position: relative; height: 420px; }
+  .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .lg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .lg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .ctrls { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card h3 {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--dim); margin-bottom: 12px;
+  }
+
+  .scn { display: flex; gap: 5px; margin-bottom: 12px; }
+  .scn button {
+    flex: 1; padding: 6px 0; border: 1px solid var(--border); border-radius: 6px;
+    background: transparent; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .scn button:hover { border-color: var(--dim); color: var(--text); }
+  .scn button.on { background: var(--raised); border-color: var(--accent); color: var(--accent); }
+
+  .mrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mc {
+    background: var(--raised); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px; text-align: center;
+  }
+  .mc .n { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; }
+  .mc .l { font-size: 9px; color: var(--dim); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .sr { margin-bottom: 12px; }
+  .sr:last-child { margin-bottom: 0; }
+  .sl { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .sl span { font-size: 12px; color: var(--muted); }
+  .sl .v { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: var(--accent); }
+
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    box-shadow: 0 0 6px rgba(45,212,191,0.3);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg);
+    background: var(--accent); box-shadow: 0 0 6px rgba(45,212,191,0.3);
+  }
+
+  .vs { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+  .vs:last-child { margin-bottom: 0; }
+  .vs i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .vs .lb { font-size: 11px; color: var(--muted); width: 66px; flex-shrink: 0; }
+  .vs input { flex: 1; }
+  .vs .vv { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); width: 30px; text-align: right; flex-shrink: 0; }
+  .shape-hint { font-size: 9px; color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Feelix <em>Growth Model</em></h1>
+  <div class="tag">FEELIX &middot; CONFIDENTIAL &middot; M1&ndash;M24</div>
+</div>
+<p class="sub">Four volleys as kindling. Two flywheels as fire. Drag the sliders to stress-test every assumption.</p>
+
+<div class="grid">
+  <div class="chart-box">
+    <div class="chart-wrap"><canvas id="c"></canvas></div>
+    <div class="legend">
+      <div class="lg"><i style="background:var(--v1)"></i>V1: Invites</div>
+      <div class="lg"><i style="background:var(--v2)"></i>V2: Media</div>
+      <div class="lg"><i style="background:var(--v3)"></i>V3: tastePlay</div>
+      <div class="lg"><i style="background:var(--v4)"></i>V4: Spark</div>
+      <div class="lg"><i style="background:var(--net)"></i>Network Effect</div>
+      <div class="lg"><i style="background:var(--b2b)"></i>B2B Flywheel</div>
+    </div>
+  </div>
+
+  <div class="ctrls">
+    <div class="card">
+      <h3>Scenario</h3>
+      <div class="scn">
+        <button data-s="low" onclick="snap('low')">Low</button>
+        <button data-s="base" class="on" onclick="snap('base')">Base</button>
+        <button data-s="high" onclick="snap('high')">High</button>
+      </div>
+      <div class="mrow">
+        <div class="mc"><div class="n" id="xM12">-</div><div class="l">M12 MAU</div></div>
+        <div class="mc"><div class="n" id="xM24">-</div><div class="l">M24 MAU</div></div>
+        <div class="mc"><div class="n" id="xCh">-</div><div class="l">M24 Churn</div></div>
+        <div class="mc"><div class="n" id="xFl">-</div><div class="l">Flywheel %</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Global Parameters</h3>
+      <div class="sr">
+        <div class="sl"><span>k Multiplier</span><span class="v" id="dK">1.00</span></div>
+        <input type="range" id="sK" min="0.50" max="1.50" step="0.01" value="1.00">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Churn Floor</span><span class="v" id="dC">3.0%</span></div>
+        <input type="range" id="sC" min="1.5" max="7.0" step="0.1" value="3.0">
+      </div>
+      <div class="sr">
+        <div class="sl"><span>Density Midpoint</span><span class="v" id="dD">150K</span></div>
+        <input type="range" id="sD" min="80" max="250" step="5" value="150">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Curve Shape <span class="shape-hint">S-curve &larr; &rarr; Bell</span></h3>
+      <div class="vs"><i style="background:var(--v1)"></i><span class="lb">Invites</span><input type="range" id="sh1" min="0" max="1" step="0.05" value="1"><span class="vv" id="sv1">S</span></div>
+      <div class="vs"><i style="background:var(--v2)"></i><span class="lb">Media</span><input type="range" id="sh2" min="0" max="1" step="0.05" value="1"><span class="vv" id="sv2">S</span></div>
+      <div class="vs"><i style="background:var(--v3)"></i><span class="lb">tastePlay</span><input type="range" id="sh3" min="0" max="1" step="0.05" value="1"><span class="vv" id="sv3">S</span></div>
+      <div class="vs"><i style="background:var(--v4)"></i><span class="lb">Spark</span><input type="range" id="sh4" min="0" max="1" step="0.05" value="1"><span class="vv" id="sv4">S</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================================================
+   MODEL — Feelix User Growth Architecture (canonical)
+   =================================================== */
+var V = [
+  { L:20000,  k:0.85, t0:4,  act:1,  ramp:0, ch:0.08, coup:0    },
+  { L:35000,  k:0.30, t0:10, act:1,  ramp:0, ch:0.10, coup:0    },
+  { L:350000, k:0.40, t0:10, act:5,  ramp:3, ch:0.14, coup:0.15 },
+  { L:60000,  k:0.30, t0:18, act:10, ramp:3, ch:0.04, coup:0.25 }
+];
+var ORG = [[10000,.01],[50000,.02],[100000,.035],[200000,.045],[400000,.055]];
+var BTB = [[50000,.5],[100000,1.5],[200000,3],[400000,5]];
+var BPC = 1500;
+var CH0 = 0.10;
+
+function interp(tbl, x) {
+  if (x <= tbl[0][0]) return tbl[0][1];
+  for (var i = 1; i < tbl.length; i++) {
+    if (x <= tbl[i][0]) {
+      var f = (x - tbl[i-1][0]) / (tbl[i][0] - tbl[i-1][0]);
+      return tbl[i-1][1] + f * (tbl[i][1] - tbl[i-1][1]);
+    }
+  }
+  return tbl[tbl.length-1][1];
+}
+
+function sig(L, k, t0, t) { return L / (1 + Math.exp(-k * (t - t0))); }
+
+function P() {
+  return {
+    km: parseFloat(document.getElementById('sK').value),
+    cf: parseFloat(document.getElementById('sC').value) / 100,
+    dm: parseFloat(document.getElementById('sD').value) * 1000,
+    sh: [parseFloat(document.getElementById('sh1').value),
+         parseFloat(document.getElementById('sh2').value),
+         parseFloat(document.getElementById('sh3').value),
+         parseFloat(document.getElementById('sh4').value)]
+  };
+}
+
+function run() {
+  var p = P();
+  var vd = [[],[],[],[]];
+  var ne = [];
+  var bf = [];
+
+  for (var m = 1; m <= 24; m++) {
+    var kb = [0,0,0,0];
+    for (var i = 0; i < 4; i++) {
+      if (V[i].coup > 0 && m >= V[i].act) {
+        for (var j = 0; j < 4; j++) { if (j !== i) kb[j] += V[i].coup; }
+      }
+    }
+
+    var vm = [0,0,0,0];
+    for (var i = 0; i < 4; i++) {
+      if (m < V[i].act) { vd[i].push(0); continue; }
+      var ek = V[i].k * p.km * (1 + kb[i]);
+      var eL = V[i].L * p.km;
+      var raw = sig(eL, ek, V[i].t0, m);
+      if (V[i].ramp > 0) {
+        var since = m - V[i].act;
+        if (since < V[i].ramp) raw *= since / V[i].ramp;
+      }
+      if (p.sh[i] < 1) {
+        var pk = V[i].t0;
+        if (m > pk) {
+          var decay = Math.exp(-0.08 * (1 - p.sh[i]) * Math.pow(m - pk, 1.5));
+          raw *= p.sh[i] + (1 - p.sh[i]) * decay;
+        }
+      }
+      var vc = V[i].ch * (p.cf / 0.03);
+      raw *= (1 - vc * 0.3);
+      vm[i] = Math.max(0, raw);
+      vd[i].push(vm[i]);
+    }
+
+    var vt = vm[0] + vm[1] + vm[2] + vm[3];
+    var org = vt * interp(ORG, vt);
+    var ec = p.cf + (CH0 - p.cf) / (1 + Math.pow(vt / p.dm, 2));
+    var saved = vt * (CH0 - ec);
+    ne.push(Math.max(0, saved + org));
+
+    var camps = interp(BTB, vt);
+    var b = camps * BPC * p.km;
+    if (m < 6) b = 0;
+    bf.push(Math.max(0, b));
+  }
+  return { vd: vd, ne: ne, bf: bf };
+}
+
+function totalAt(r, i) {
+  return (r.vd[0][i]||0)+(r.vd[1][i]||0)+(r.vd[2][i]||0)+(r.vd[3][i]||0)+(r.ne[i]||0)+(r.bf[i]||0);
+}
+
+function churnAt(r, i) {
+  var p = P();
+  var vt = (r.vd[0][i]||0)+(r.vd[1][i]||0)+(r.vd[2][i]||0)+(r.vd[3][i]||0);
+  return p.cf + (CH0 - p.cf) / (1 + Math.pow(vt / p.dm, 2));
+}
+
+function fmt(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return Math.round(n/1e3)+'K';
+  return Math.round(n)+'';
+}
+
+/* ===================================================
+   CHART — Chart.js 4, native stacking, raw per-layer
+   =================================================== */
+var labels = [];
+for (var i = 1; i <= 24; i++) labels.push('M'+i);
+
+function mkds(label, r, g, b) {
+  return {
+    label: label,
+    data: [],
+    backgroundColor: 'rgba('+r+','+g+','+b+',0.50)',
+    borderColor: 'rgba('+r+','+g+','+b+',0.80)',
+    borderWidth: 1.5,
+    fill: true,
+    pointRadius: 0,
+    pointHitRadius: 10,
+    tension: 0.35
+  };
+}
+
+var _lastR = null;
+
+var chart = new Chart(document.getElementById('c'), {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      mkds('V1: Invites',    168, 85,  247),
+      mkds('V2: Media',      244, 114, 182),
+      mkds('V3: tastePlay',  34,  211, 238),
+      mkds('V4: Spark',      232, 197, 71),
+      mkds('Network Effect', 94,  162, 227),
+      mkds('B2B Flywheel',   139, 149, 165)
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 150 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1A1D2A',
+        titleColor: '#E4E5EB',
+        bodyColor: '#8B8FA0',
+        borderColor: '#252838',
+        borderWidth: 1,
+        titleFont: { family: 'JetBrains Mono', size: 12 },
+        bodyFont: { family: 'JetBrains Mono', size: 11 },
+        padding: 12,
+        callbacks: {
+          label: function(ctx) {
+            var val = ctx.raw || 0;
+            return ctx.dataset.label + ': ' + fmt(val);
+          },
+          afterBody: function(items) {
+            if (!items.length || !_lastR) return [];
+            var idx = items[0].dataIndex;
+            return ['', 'Total MAU: ' + fmt(totalAt(_lastR, idx))];
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { color: 'rgba(37,40,56,0.5)', lineWidth: 0.5 },
+        ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#5C6070' }
+      },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+        grid: { color: 'rgba(37,40,56,0.5)', lineWidth: 0.5 },
+        ticks: {
+          font: { family: 'JetBrains Mono', size: 10 },
+          color: '#5C6070',
+          callback: function(v) { return fmt(v); }
+        }
+      }
+    }
+  }
+});
+
+/* ===================================================
+   UPDATE
+   =================================================== */
+function refresh() {
+  var r = run();
+  _lastR = r;
+
+  chart.data.datasets[0].data = r.vd[0];
+  chart.data.datasets[1].data = r.vd[1];
+  chart.data.datasets[2].data = r.vd[2];
+  chart.data.datasets[3].data = r.vd[3];
+  chart.data.datasets[4].data = r.ne;
+  chart.data.datasets[5].data = r.bf;
+  chart.update('none');
+
+  var m12 = totalAt(r, 11);
+  var m24 = totalAt(r, 23);
+  var ch24 = churnAt(r, 23);
+  var fly = m24 > 0 ? (r.ne[23] + r.bf[23]) / m24 * 100 : 0;
+
+  document.getElementById('xM12').textContent = fmt(m12);
+  document.getElementById('xM24').textContent = fmt(m24);
+  document.getElementById('xCh').textContent = (ch24*100).toFixed(1)+'%';
+  document.getElementById('xFl').textContent = Math.round(fly)+'%';
+
+  var p = P();
+  document.getElementById('dK').textContent = p.km.toFixed(2);
+  document.getElementById('dC').textContent = (p.cf*100).toFixed(1)+'%';
+  document.getElementById('dD').textContent = Math.round(p.dm/1000)+'K';
+
+  for (var n = 1; n <= 4; n++) {
+    var v = p.sh[n-1];
+    document.getElementById('sv'+n).textContent = v >= 0.9 ? 'S' : v <= 0.1 ? 'Bell' : Math.round(v*100)+'%';
+  }
+}
+
+/* ===================================================
+   SCENARIOS
+   =================================================== */
+function snap(s) {
+  var btns = document.querySelectorAll('.scn button');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+  document.querySelector('[data-s="'+s+'"]').classList.add('on');
+
+  var pre = { low:{k:.70,c:3.5,d:160}, base:{k:1,c:3,d:150}, high:{k:1.3,c:2,d:120} }[s];
+  document.getElementById('sK').value = pre.k;
+  document.getElementById('sC').value = pre.c;
+  document.getElementById('sD').value = pre.d;
+  var shIds = ['sh1','sh2','sh3','sh4'];
+  for (var i = 0; i < 4; i++) document.getElementById(shIds[i]).value = 1;
+  refresh();
+}
+
+/* ===================================================
+   LISTENERS
+   =================================================== */
+var sliderIds = ['sK','sC','sD','sh1','sh2','sh3','sh4'];
+for (var i = 0; i < sliderIds.length; i++) {
+  (function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      var btns = document.querySelectorAll('.scn button');
+      for (var j = 0; j < btns.length; j++) btns[j].classList.remove('on');
+      refresh();
+    });
+  })(sliderIds[i]);
+}
+
+refresh();
+</script>
+</body>
+</html>
